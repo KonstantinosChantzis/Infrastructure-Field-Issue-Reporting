@@ -1,109 +1,195 @@
-# Infrastructure Field Issue Reporting (ArcGIS QuickCapture + ArcGIS Online)
+# Infrastructure Field Issue Reporting
 
-[English](#english) | [Deutsch](#deutsch)
+[English](#infrastructure-field-issue-reporting) | [Deutsch](#deutsch)
 
----
+End-to-end **Enterprise GIS workflow in ArcGIS Online** for reporting and managing infrastructure issues (**road damage** and **damaged utility poles**) in the **Ruhr area (NRW, Germany)**.
 
-## English
+Field technicians capture issues with **ArcGIS Field Maps** on a smartphone, the office tracks every report through a **status workflow** (Open → In Progress → Resolved) in an **ArcGIS Dashboard**, and an **Experience Builder** web app lets operations staff update reports in the browser.
 
-### Overview
-A field data collection workflow for reporting infrastructure issues (road damage, damaged utility poles) in the Ruhr area, Germany. A hosted feature layer in ArcGIS Online stores the reports, an ArcGIS QuickCapture project provides one-tap reporting buttons for field staff, and a web map visualizes all reports by issue type.
-
-### Workflow
-1. Created a hosted **point feature layer** (`InfrastructureIssues`) in ArcGIS Online with the fields `Issue Type` and `Description`.
-2. Built an **ArcGIS QuickCapture** project on top of the layer with two buttons: **Road Damage** and **Damaged Pole**. Each button writes a fixed `Issue Type`, while the field worker types a short `Description` (button user input).
-3. Created a **web map** from the layer, enabled pop-ups, and styled the points by `Issue Type` (unique symbols, with legend).
-4. Entered 9 sample reports across the Ruhr area (Essen, Duisburg, Bochum, Dortmund and others) through the Map Viewer editor to demonstrate the data flow.
-5. Exported the layer to CSV for a verifiable raw-data copy.
-
-### Result
-
-| Issue Type | Reports |
-|---|---|
-| Road Damage | 5 |
-| Damaged Pole | 4 |
-| **Total** | **9** |
-
-### Screenshots
-
-**QuickCapture project (button design)**
-
-![QuickCapture designer](qc_designer.png)
-
-**Web map, styled by issue type**
-
-![Web map](web_map_styled.png)
-
-**Pop-up of a single report**
-
-![Pop-up](popup.png)
-
-**Attribute table**
-
-![Attribute table](attribute_table.png)
-
-### Data
-- [infrastructure_issues.csv](infrastructure_issues.csv): export of all 9 sample reports.
-
-### Notes
-- The reports are sample data entered for demonstration. The QuickCapture project was configured and saved, but not field-tested on a mobile device.
-- The course ArcGIS account used for this project is deleted on 21 October 2026, so the screenshots and the CSV in this repository are the permanent record.
-
-### Tools
-ArcGIS Online · ArcGIS QuickCapture · Map Viewer · Hosted Feature Layers · Instant Apps (template selection)
-
-### Source
-Esri, "The ArcGIS Imagery MOOC: Foundations and Frontiers" (completed September 2026): adapted exercise, reframed from park trail reports to infrastructure field reporting.
+![Operations dashboard](images/04_dashboard.png)
 
 ---
 
-## Deutsch
+## Key results
 
-### Überblick
-Ein Workflow zur Felddatenerfassung für Infrastrukturschäden (Straßenschäden, beschädigte Strommasten) im Ruhrgebiet. Ein gehosteter Feature-Layer in ArcGIS Online speichert die Meldungen, ein ArcGIS-QuickCapture-Projekt bietet Meldebuttons für Mitarbeitende im Feld, und eine Webkarte visualisiert alle Meldungen nach Schadensart.
-
-### Ablauf
-1. Erstellung eines gehosteten **Punkt-Feature-Layers** (`InfrastructureIssues`) in ArcGIS Online mit den Feldern `Issue Type` und `Description`.
-2. Aufbau eines **ArcGIS-QuickCapture**-Projekts auf Basis des Layers mit zwei Buttons: **Road Damage** und **Damaged Pole**. Jeder Button schreibt einen festen `Issue Type`, die Beschreibung (`Description`) wird vom Mitarbeitenden eingegeben (Button-Benutzereingabe).
-3. Erstellung einer **Webkarte** aus dem Layer, Aktivierung von Pop-ups und Darstellung der Punkte nach `Issue Type` (eindeutige Symbole, mit Legende).
-4. Eingabe von 9 Beispielmeldungen im Ruhrgebiet (Essen, Duisburg, Bochum, Dortmund u. a.) über den Editor im Map Viewer, um den Datenfluss zu demonstrieren.
-5. Export des Layers als CSV für eine nachvollziehbare Rohdatenkopie.
-
-### Ergebnis
-
-| Schadensart | Meldungen |
+| | |
 |---|---|
-| Road Damage (Straßenschaden) | 5 |
-| Damaged Pole (beschädigter Mast) | 4 |
-| **Gesamt** | **9** |
+| Study area | Ruhr area – Essen, Bochum, Duisburg, Dortmund, Gelsenkirchen, Oberhausen, Mülheim an der Ruhr, Herne, Witten |
+| Reports | 10 (9 initial + 1 captured live in the field with Field Maps, incl. 2 photos) |
+| Status | **5 Open · 3 In Progress · 2 Resolved** |
+| Issue types | Road Damage 60 % · Damaged Pole 40 % |
+| Apps | Field Maps (mobile) · Map Viewer · Dashboards · Experience Builder |
 
-### Screenshots
+---
 
-**QuickCapture-Projekt (Button-Design)**
+## Workflow
 
-![QuickCapture Designer](qc_designer.png)
+1. **Hosted feature layer** – point data (CSV, WGS84) published as an editable hosted feature layer
+2. **Data model**
+   - New fields **Status** (Open / In Progress / Resolved, default *Open*) and **Priority** (High / Medium / Low, default *Medium*)
+   - **Coded value domains** (lists) for Issue Type, Status and Priority → no free-text errors
+   - Existing records updated with **Calculate Field**
+   - **GlobalID** added, **attachments** enabled for photos
+3. **Editing settings**
+   - Editing enabled (add, update, delete)
+   - **Editor tracking** – CreationDate, Creator, EditDate, Editor are written automatically
+   - **Sync** enabled for offline use in the field
 
-**Webkarte, nach Schadensart dargestellt**
+![Attribute table with status, priority and editor tracking](images/01_data_schema.png)
 
-![Webkarte](web_map_styled.png)
+4. **Web map** – features symbolised by status: red = Open, orange = In Progress, green = Resolved
 
-**Pop-up einer einzelnen Meldung**
+![Web map symbolised by status](images/03_web_map_status.png)
 
-![Pop-up](popup.png)
+5. **Field Maps form** (Field Maps Designer)
+   - Logical field order: Issue Type → Priority → Description → Photos → Status
+   - Issue Type and Priority are **required**
+   - Drop-down lists for all coded fields, camera access for photos
+   - Coordinates are not typed in – the location comes from the device GPS / map
 
-**Attributtabelle**
+![Field Maps form on a smartphone](images/02_field_maps_form.png)
 
-![Attributtabelle](attribute_table.png)
+6. **Field test** – a new report was captured on a smartphone with 2 photos; afterwards several reports were updated to *In Progress* / *Resolved* to simulate the repair process
+7. **Dashboard** – status indicators (Open / In Progress / Resolved), map, pie chart by issue type and a report list linked to the map (zoom on selection); all elements update automatically
+8. **Experience Builder app** – map with legend, layer list, basemap gallery and an **Edit** widget for creating new reports and changing the status in the browser
 
-### Daten
-- [infrastructure_issues.csv](infrastructure_issues.csv): Export aller 9 Beispielmeldungen.
+![Experience Builder app](images/05_experience_app.png)
 
-### Hinweise
-- Die Meldungen sind zu Demonstrationszwecken eingegebene Beispieldaten. Das QuickCapture-Projekt wurde konfiguriert und gespeichert, aber nicht auf einem Mobilgerät im Feld getestet.
-- Der für dieses Projekt genutzte Kurs-Account bei ArcGIS wird am 21. Oktober 2026 gelöscht, daher sind die Screenshots und die CSV in diesem Repository die dauerhafte Dokumentation.
+![Status update in the browser](images/06_status_update.png)
 
-### Werkzeuge
-ArcGIS Online · ArcGIS QuickCapture · Map Viewer · Gehostete Feature-Layer · Instant Apps (Vorlagenauswahl)
+---
 
-### Quelle
-Esri, "The ArcGIS Imagery MOOC: Foundations and Frontiers" (abgeschlossen September 2026): angepasste Übung, von Parkweg-Meldungen auf Infrastruktur-Felderfassung umgestaltet.
+## Roles (recommended setup)
+
+The MOOC account used for this project does not allow creating groups, so roles were not configured. In a real organisation the solution would be shared through two ArcGIS groups:
+
+| Role | Group | Access |
+|---|---|---|
+| Field crew | *Field Crew* | Field Maps – capture new reports, add photos |
+| Operations | *Operations* | Dashboard + Experience Builder app – monitor, update status |
+
+---
+
+## Limitations
+
+- Demonstration data (10 reports), not real maintenance records
+- Created in a temporary ArcGIS Online MOOC account – the live apps are no longer online; the screenshots document the result
+- Groups and role-based sharing are described but not implemented (see above)
+
+---
+
+## Repository structure
+
+```
+Infrastructure-Field-Issue-Reporting/
+├── images/
+│   ├── 01_data_schema.png
+│   ├── 02_field_maps_form.png
+│   ├── 03_web_map_status.png
+│   ├── 04_dashboard.png
+│   ├── 05_experience_app.png
+│   └── 06_status_update.png
+├── LICENSE
+└── README.md
+```
+
+---
+
+## Tools
+
+ArcGIS Online · ArcGIS Field Maps · Field Maps Designer · Map Viewer · ArcGIS Dashboards · ArcGIS Experience Builder
+
+## License
+
+MIT License – see [LICENSE](LICENSE)
+
+---
+---
+
+# Deutsch
+
+[English](#infrastructure-field-issue-reporting) | [Deutsch](#deutsch)
+
+Durchgängiger **Enterprise-GIS-Workflow in ArcGIS Online** zur Erfassung und Bearbeitung von Störungsmeldungen an der Infrastruktur (**Straßenschäden** und **beschädigte Masten**) im **Ruhrgebiet (NRW)**.
+
+Techniker erfassen Störungen mit **ArcGIS Field Maps** auf dem Smartphone, der Innendienst verfolgt jede Meldung über einen **Status-Workflow** (Offen → In Bearbeitung → Erledigt) in einem **ArcGIS Dashboard**, und eine **Experience-Builder**-Web-App ermöglicht die Bearbeitung der Meldungen im Browser.
+
+![Einsatz-Dashboard](images/04_dashboard.png)
+
+---
+
+## Zentrale Ergebnisse
+
+| | |
+|---|---|
+| Gebiet | Ruhrgebiet – Essen, Bochum, Duisburg, Dortmund, Gelsenkirchen, Oberhausen, Mülheim an der Ruhr, Herne, Witten |
+| Meldungen | 10 (9 Ausgangsdaten + 1 live im Feld mit Field Maps erfasst, inkl. 2 Fotos) |
+| Status | **5 Open · 3 In Progress · 2 Resolved** |
+| Störungsarten | Road Damage 60 % · Damaged Pole 40 % |
+| Apps | Field Maps (mobil) · Map Viewer · Dashboards · Experience Builder |
+
+---
+
+## Arbeitsablauf
+
+1. **Gehosteter Feature-Layer** – Punktdaten (CSV, WGS84) als bearbeitbarer Feature-Layer veröffentlicht
+2. **Datenmodell**
+   - Neue Felder **Status** (Open / In Progress / Resolved, Standard *Open*) und **Priority** (High / Medium / Low, Standard *Medium*)
+   - **Domänen (Werte­listen)** für Issue Type, Status und Priority → keine Tippfehler
+   - Bestehende Datensätze mit **Feld berechnen** aktualisiert
+   - **GlobalID** ergänzt, **Anhänge** für Fotos aktiviert
+3. **Bearbeitungseinstellungen**
+   - Bearbeitung aktiviert (Hinzufügen, Aktualisieren, Löschen)
+   - **Editor-Tracking** – CreationDate, Creator, EditDate, Editor werden automatisch geschrieben
+   - **Synchronisierung** für die Offline-Nutzung im Feld
+
+![Attributtabelle mit Status, Priorität und Editor-Tracking](images/01_data_schema.png)
+
+4. **Webkarte** – Darstellung nach Status: rot = Open, orange = In Progress, grün = Resolved
+
+![Webkarte nach Status](images/03_web_map_status.png)
+
+5. **Field-Maps-Formular** (Field Maps Designer)
+   - Logische Reihenfolge: Issue Type → Priority → Description → Photos → Status
+   - Issue Type und Priority sind **Pflichtfelder**
+   - Auswahllisten für alle codierten Felder, Kamerazugriff für Fotos
+   - Keine manuelle Eingabe von Koordinaten – die Position kommt vom GPS / aus der Karte
+
+![Field-Maps-Formular auf dem Smartphone](images/02_field_maps_form.png)
+
+6. **Feldtest** – eine neue Meldung wurde mit 2 Fotos auf dem Smartphone erfasst; anschließend wurden mehrere Meldungen auf *In Progress* / *Resolved* gesetzt, um den Reparaturablauf zu simulieren
+7. **Dashboard** – Statusanzeigen (Open / In Progress / Resolved), Karte, Kreisdiagramm nach Störungsart und eine mit der Karte verknüpfte Meldungsliste (Zoom bei Auswahl); alle Elemente aktualisieren sich automatisch
+8. **Experience-Builder-App** – Karte mit Legende, Layerliste, Grundkarten-Galerie und **Edit**-Widget zum Erfassen neuer Meldungen und Ändern des Status im Browser
+
+![Experience-Builder-App](images/05_experience_app.png)
+
+![Statusänderung im Browser](images/06_status_update.png)
+
+---
+
+## Rollen (empfohlene Umsetzung)
+
+Im verwendeten MOOC-Konto können keine Gruppen angelegt werden, daher wurden die Rollen nicht eingerichtet. In einer echten Organisation würde die Lösung über zwei ArcGIS-Gruppen geteilt:
+
+| Rolle | Gruppe | Zugriff |
+|---|---|---|
+| Außendienst | *Field Crew* | Field Maps – neue Meldungen erfassen, Fotos anhängen |
+| Innendienst | *Operations* | Dashboard + Experience-Builder-App – überwachen, Status ändern |
+
+---
+
+## Einschränkungen
+
+- Demonstrationsdaten (10 Meldungen), keine echten Instandhaltungsdaten
+- Erstellt in einem befristeten ArcGIS-Online-MOOC-Konto – die Apps sind nicht mehr online; die Screenshots dokumentieren das Ergebnis
+- Gruppen und rollenbasiertes Teilen sind beschrieben, aber nicht umgesetzt (siehe oben)
+
+---
+
+## Werkzeuge
+
+ArcGIS Online · ArcGIS Field Maps · Field Maps Designer · Map Viewer · ArcGIS Dashboards · ArcGIS Experience Builder
+
+## Lizenz
+
+MIT-Lizenz – siehe [LICENSE](LICENSE)
